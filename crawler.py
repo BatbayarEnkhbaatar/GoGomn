@@ -21,7 +21,7 @@ for i in range(1, 10):
             "ID": "ID_" + str(id),
             "Link" : link
         })
-
+# Export job list as json file
 with open("jobs.json", "w", encoding="utf-8") as outcomes:
     json.dump(jobs, outcomes, ensure_ascii=False)
 
