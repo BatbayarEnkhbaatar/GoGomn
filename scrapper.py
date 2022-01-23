@@ -35,27 +35,48 @@ for j in range(0, numb_of_jobs):
             date = datetime.today()
             link = item["job_url"]
             driver.get(link)
-            article_title_xpath = driver.find_element_by_xpath(
-                "//*[@id='news-morebody']/div[1]/h1")
-            article_title = {
-            'title': article_title_xpath.get_attribute("innerHTML")
-            }
-            if len(driver.find_element_by_xpath("//div[@class='text-gray text-12 uk-text-uppercase margin-top-5']"))!=0:
-                published_date_xpath = driver.find_element_by_xpath("//div[@class='text-gray text-12 uk-text-uppercase margin-top-5']")
-                published_date = {
-                    'published_date': published_date_xpath.get_attribute("innerHTML")
-                }
-            else:
-                published_date = {
-                    'published_date': "unknown"
-                }
-            parentdiv = driver.find_element_by_xpath("//div[@class='not-short-read  uk-container uk-column-1-1 uk-column-divider seo-bagana-tablet']")
-            count = len(parentdiv.find_elements_by_tag_name("p"))
-            for i in range(0, count):
-                t = parentdiv.find_elements_by_tag_name('p')[i]
-                content_text = t.get_attribute("innerHTML")
-                content = cleanhtml(content) + " " + cleanhtml(content_text)
-            db.put_items_scraping_results(job_id, status, str(article_title).repalce(" ", ""),str(content), str(published_date))
-        job_status = "completed"
-        db.update_crawling_results(job_id, status, link, str(date))
-        content = ""
+            published_date = {}
+            status = "executed"
+            db.update_crawling_results(job_id, status, link, str(date))
+            try:
+                if len(driver.find_element_by_xpath("//*[@id='news-morebody']/div[1]/h1").get_attribute("innerHTML")) > 0:
+                    article_title_xpath = driver.find_element_by_xpath("//*[@id='news-morebody']/div[1]/h1").get_attribute("innerHTML")
+                    article_title = {
+                        'title': article_title_xpath.get_attribute("innerHTML").strip()
+                        }
+                else:
+                    article_title = {
+                        'title': "untitled"
+                    }
+                if len(driver.find_element_by_xpath("//div[@class='text-gray text-12 uk-text-uppercase margin-top-5']").get_attribute("innerHTML")) > 0:
+                    published_date_xpath = driver.find_element_by_xpath("//div[@class='text-gray text-12 uk-text-uppercase margin-top-5']")
+                    published_date = {
+                        'published_date': published_date_xpath.get_attribute("innerHTML")
+                    }
+                else:
+                    published_date = {
+                        'published_date': "unknown"
+                    }
+                print(published_date)
+                if len(driver.find_element_by_xpath("//div[@class='not-short-read  uk-container uk-column-1-1 uk-column-divider seo-bagana-tablet']")) > 0:
+                    print(len(driver.find_element_by_xpath("//div[@class='not-short-read  uk-container uk-column-1-1 uk-column-divider seo-bagana-tablet']")))
+                    parentdiv = driver.find_element_by_xpath("//div[@class='not-short-read  uk-container uk-column-1-1 uk-column-divider seo-bagana-tablet']")
+                    count = len(parentdiv.find_elements_by_tag_name("p"))
+                    for i in range(0, count):
+                        t = parentdiv.find_elements_by_tag_name('p')[i]
+                        content_text = cleanhtml(t.get_attribute("innerHTML"))
+                        content = content + " " + content_text
+                        article_title = str(article_title)
+                        # article_title = article_title.strip()
+                    db.put_items_scraping_results(job_id, status, article_title,str(content), str(published_date))
+                    job_status = "completed"
+                    db.update_crawling_results(job_id, status, link, str(date))
+                else:
+                    job_status = "incompleted"
+                    db.update_crawling_results(job_id, status, link, str(date))
+                content = ""
+            except:
+                pass
+date = datetime.today()
+db.put_last_scraped_time(link, date)
+db.put_items_total_info(date, numb_of_jobs)

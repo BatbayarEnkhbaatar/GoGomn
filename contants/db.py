@@ -6,7 +6,7 @@ dynamodb = boto3.resource("dynamodb")
 table3 = dynamodb.Table("total_info")
 table1 = dynamodb.Table("crawling_results")
 table2 = dynamodb.Table("scraping_results")
-
+table4 = dynamodb.Table("last_scraped")
 def getitem_all():
     job_id = table1.query(AttributesToGet=['task_id'])
     # print(job_id['Items'])
@@ -64,12 +64,18 @@ def put_items_scraping_results(job_id, status, titile, result, published_date ):
         }
     )
     return response
+def put_last_scraped_time(target_website, last_execution):
+    response = table2.put_item(
+        Item={
+            'target_website': target_website,
+            'last_scraped_time': last_execution,
+        }
+    )
+    return response
 def put_items_total_info(date, status, name, number):
     response = table3.put_item(
         Item={
-            'date': date,
             'object': name,
-            'status': status,
             'total_page_number': number
             }
     )
