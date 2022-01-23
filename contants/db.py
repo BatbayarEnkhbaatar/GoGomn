@@ -7,95 +7,73 @@ table3 = dynamodb.Table("total_info")
 table1 = dynamodb.Table("crawling_results")
 table2 = dynamodb.Table("scraping_results")
 
-
 def getitem_all():
     job_id = table1.query(AttributesToGet=['task_id'])
     # print(job_id['Items'])
     return job_id['Items']
 
-
-# item_list = getitem_all()
-# for item in item_list:
-#     print(item)
-
-def get_an_item(task_status):
-    # Key = {"task_status": task_status}
+def get_a_new_job(task_status):
     response = table1.query(
-        IndexName="task_status-index",
-        KeyConditionExpression=Key("task_status").eq(task_status), Limit=1
+        IndexName="status-date-index",
+        KeyConditionExpression=Key("job_status").eq(task_status), Limit=1
     )
-    # print(response['Items'])
     return response['Items']
 
-
-def get_count_item(task_status):
-    total = table1.query(
-        IndexName="task_status-index",
-        KeyConditionExpression=Key("task_status").eq(task_status)
-    )
-    # print(total["Items"])
-    return len(total["Items"])
-
-
-def update_item(task_id, job_id, n_status, xpath_link, rule_data):
-    response = table2.update_item(
+def update_crawling_results(job_id, new_status, link, date):
+    response = table1.update_item(
         Key={
-            'task_id': task_id,
-            'job_id': job_id
+            'job_id': job_id,
+            'job_url': link
         },
-        UpdateExpression="set task_status=:new_status, xpath_link=:new_xpath, rule_data=:new_rule_data",
+        UpdateExpression="SET job_status=:n_status, inserted_date=:date_in",
         ExpressionAttributeValues={
-            ':new_status': n_status,
-            ':new_xpath': xpath_link,
-            ':new_rule_data': rule_data
+            ':n_status': new_status,
+            ':date_in': date
         },
         ReturnValues="UPDATED_NEW"
     )
     return response
 
+def get_count_item(task_status):
+    total = table1.query(
+        IndexName="status-date-index",
+        KeyConditionExpression=Key("job_status").eq(task_status)
+    )
+    # print(total["Items"])
+    return len(total["Items"])
 
-def put_items_crawling_results(job_id, status, link):
+def put_items_crawling_results(job_id, status, link, date):
     response = table1.put_item(
         Item={
             'job_id': job_id,
-            'urls': {
-                'status': status,
-                'link': link
-            }
+            'job_url': link,
+            'job_status': status,
+            'inserted_date': date
+        }
+    )
+    return response
+
+def put_items_scraping_results(job_id, status, titile, result, published_date ):
+    response = table2.put_item(
+        Item={
+            'job_id': job_id,
+            'result': status,
+            'title': titile,
+            'result_data': result,
+            'date': published_date
         }
     )
     return response
 def put_items_total_info(date, status, name, number):
-    response = table1.put_item(
+    response = table3.put_item(
         Item={
             'date': date,
-            'name': {
-                'status': status,
-                'target_website': name,
-                'total_page_number': number
+            'object': name,
+            'status': status,
+            'total_page_number': number
             }
-        }
     )
     return response
 
-# task_status = "Changed"
-# print("Please enter task id: ")
-# task_id = input()
-#
-# print("Please enter JOB ID: ")
-# job_id = input()
-# print("Please enter New Status: ")
-# task_status = input()
-# print("Please enter Xpath: ")
-# xpath = input()
-# print("Please enter Rule_Data ")
-# rule = input()
-# print(update_item(str(task_id), str(job_id), task_status, xpath, rule))
-# print("it is updated")
 
-#
-# print("Please enter status: ")
-# new_status = input()
-# item_returned = get_count_item("ongoing")
-# print(item_returned)
 
