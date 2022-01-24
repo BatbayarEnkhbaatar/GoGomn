@@ -81,4 +81,8 @@ def put_items_total_info(date, status, name, number):
     )
     return response
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f733b80fb015049b471bc581d68d9b2e64463e1a
 
