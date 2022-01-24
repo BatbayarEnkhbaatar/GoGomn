@@ -5,15 +5,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from datetime import datetime
 import time
 import uuid
-import contants.db as db
-import contants.constants as const
+import constant.db as db
+import constant.constants as const
 import re
 
 def cleanhtml(raw_html):
     cleanr = re.compile('<.*?>')
     cleantext = re.sub(cleanr, '', raw_html)
     cleantext = cleantext.replace('&nbsp;', '')
-    cleantext = cleantext.lstrip()
     return cleantext
 
 
@@ -60,7 +59,7 @@ while link_num < 500:
                         class_clock = "far fa-clock"
                         get_att = driver.find_element_by_xpath('/html/body/div[2]/div[2]/section[2]/div/div/div[1]/div/div[4]/article['+ str(i) + ']/a')
                         get_published_time = driver.find_element_by_xpath('.//div[@class="text-gray"]').get_attribute("innerHTML")
-                        cleared_time = cleanhtml(get_published_time)
+                        cleared_time = cleanhtml(get_published_time).split(' ')
                         print(cleanhtml(cleared_time))
                         link = get_att.get_attribute('href')
                         print(job_id, "exported successfully")

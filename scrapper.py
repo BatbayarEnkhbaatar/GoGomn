@@ -1,9 +1,9 @@
 from selenium import webdriver
 from datetime import datetime
-import contants.db as db
+import constant.db as db
 import re
 <<<<<<< HEAD
-import contants.constants as const
+import constant.constants as const
 options = webdriver.ChromeOptions()
 options.add_argument(
     '--user-agent = Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36')
