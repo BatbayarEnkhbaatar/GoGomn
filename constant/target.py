@@ -1,0 +1,4 @@
+class[
+target = "gogomn"
+target
+]
