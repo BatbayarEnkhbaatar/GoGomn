@@ -6,8 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import json
 import time
 import uuid
-import contants.db as db
-import contants.input_item as input
+import constant.db as db
+import constant.input_item as input
 from datetime import date
 
 

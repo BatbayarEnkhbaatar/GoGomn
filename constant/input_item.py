@@ -15,3 +15,16 @@ def input_total_info(date, status, name, number):
             }
     )
     return table
+
+def input_last_scraped(target_id, name, number):
+
+    table = dynamodb.Table("last_scraped")
+    table.put_item(
+        Item={
+            'target_id': date,
+            'object': name,
+            'status': status,
+            'total_page_number': number
+            }
+    )
+    return table

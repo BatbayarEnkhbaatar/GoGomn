@@ -6,7 +6,7 @@ dynamodb = boto3.resource("dynamodb")
 table3 = dynamodb.Table("total_info")
 table1 = dynamodb.Table("crawling_results")
 table2 = dynamodb.Table("scraping_results")
-table4 = dynamodb.Table("last_scraped")
+table4 = dynamodb.Table("scraping_info")
 def getitem_all():
     job_id = table1.query(AttributesToGet=['task_id'])
     # print(job_id['Items'])
@@ -64,25 +64,27 @@ def put_items_scraping_results(job_id, status, titile, result, published_date ):
         }
     )
     return response
-def put_last_scraped_time(target_website, last_execution):
-    response = table2.put_item(
+def put_items_last_scraped(web_site_name, last_scrapped, number_of_info):
+    response = table4.put_item(
         Item={
-            'target_website': target_website,
-            'last_scraped_time': last_execution,
-        }
-    )
-    return response
-def put_items_total_info(date, status, name, number):
-    response = table3.put_item(
-        Item={
-            'object': name,
-            'total_page_number': number
-            }
+            'target_name': web_site_name,
+            's_date': last_scrapped,
+            'link_no': number_of_info
+         }
     )
     return response
 
-<<<<<<< HEAD
-=======
+def get_last_scrapped(target_name):
+    target = table4.query(
+        IndexName="target_name-s_date-index",
+        KeyConditionExpression=Key("target_name").eq(target_name), Limit =1, ScanIndexForward=False
+    )
+    # print(total["Items"])
+    last_scraped_date_dic = target['Items'][0]
+    last_scraped_date = last_scraped_date_dic["s_date"]
+    return last_scraped_date
 
->>>>>>> f733b80fb015049b471bc581d68d9b2e64463e1a
 
+target_id = "gogoapp"
+target = get_last_scrapped(target_id)
+print (target)
